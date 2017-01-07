@@ -1,0 +1,12 @@
+# CMake
+CMakeFiles
+CMakeCache.txt
+cmake_install.cmake
+
+# ninja
+.ninja_deps
+.ninja_log
+
+/build.ninja
+/rules.ninja
+/boots
