@@ -22,15 +22,25 @@ int main(int argc, char *argv[]) {
   TheModule = llvm::make_unique<Module>("my cool jit", TheContext);
 
   IntegerType *I32 = Type::getInt32Ty(TheContext);
-  FunctionType *FT = FunctionType::get(I32, false);
+  Type *params[] = {I32, I32};
+  FunctionType *FT = FunctionType::get(I32, params, false);
 
   Function *F = Function::Create(FT, Function::ExternalLinkage, Twine("foo"),
                                  TheModule.get());
   BasicBlock *BB = BasicBlock::Create(TheContext, "entry", F);
   Builder.SetInsertPoint(BB);
 
-  Value *RetVal = ConstantInt::get(I32, 10, true);
-  Builder.CreateRet(RetVal);
+  const char *args[] = { "a", "b" };
+  int i = 0;
+  std::vector<Value*> FctArgs;
+
+  for (auto &Arg: F->args()) {
+    FctArgs.push_back(&Arg);
+    Arg.setName(args[i++]);
+  }
+
+  Value *adder = Builder.CreateAdd(FctArgs[0], FctArgs[1]);
+  Builder.CreateRet(adder);
 
   verifyFunction(*F);
 
